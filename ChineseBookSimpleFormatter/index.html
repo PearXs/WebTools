@@ -178,6 +178,10 @@
             <!-- 起始章节、终止章节和每行字符数在同一行 -->
             <div class="input-row">
                 <div class="textarea-wrapper">
+                    <label for="volume">卷号：</label>
+                    <input type="text" id="volume">
+                </div>
+                <div class="textarea-wrapper">
                     <label for="startChapter">起始章节号：</label>
                     <input type="text" id="startChapter" placeholder="建议使用阿拉伯数字" oninput="updateEndChapter()">
                 </div>
@@ -321,6 +325,7 @@
             var inputText = document.getElementById('inputText').value;
             var title = document.getElementById('title').value.trim();
             var author = document.getElementById('author').value.trim();
+            var volume = document.getElementById('volume').value.trim();
             var startChapter = document.getElementById('startChapter').value;
             var endChapter = document.getElementById('endChapter').value;
             var website = document.getElementById('website').value.trim();
@@ -329,9 +334,14 @@
             // 章节号格式化
             var formattedChapter;
             if (!endChapter) {
-                formattedChapter = `（${startChapter}）`;
+                formattedChapter = `${startChapter}`;
             } else {
-                formattedChapter = `（${startChapter}-${endChapter}）`;
+                formattedChapter = `${startChapter}-${endChapter}`;
+            }
+            if (!volume){
+                formattedChapter = `（${formattedChapter}）`;
+            } else{
+                formattedChapter = `（${volume} ${formattedChapter}）`;
             }
 
             var formattedTitle = `【${title}】${formattedChapter}`;
