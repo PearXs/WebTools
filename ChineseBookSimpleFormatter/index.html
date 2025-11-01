@@ -68,14 +68,19 @@
         }
 
         /* 输入控件统一样式 */
+        .input-wrap {
+            position: relative;
+            width: 100%;
+        }
+
         input[type="text"],
         input[type="number"],
         select {
-            padding: 10px;
+            width: 100%;
+            padding: 10px 30px 10px 10px;
             font-size: 15px;
             border: 1px solid #ccc;
             border-radius: 6px;
-            width: 100%;
             box-sizing: border-box;
             transition: border 0.3s;
         }
@@ -85,6 +90,27 @@
         textarea:focus {
             border-color: #3498db;
             outline: none;
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+            font-size: 16px;
+            display: none;
+        }
+
+        /* 有内容或悬停时显示清除按钮 */
+        .input-wrap:hover .clear-btn,
+        .input-wrap input:not(:placeholder-shown)~.clear-btn {
+            display: block;
+        }
+
+        .clear-btn:hover {
+            color: #e74c3c;
         }
 
         /* 文本域 */
@@ -159,15 +185,21 @@
         <div class="input-section">
             <h2>输入部分</h2>
 
-            <!-- 标题、作者、发布网站在同一行 -->
+            <!-- 标题、作者、发布网站 -->
             <div class="input-row">
                 <div class="textarea-wrapper">
                     <label for="title">标题：</label>
-                    <input type="text" id="title">
+                    <div class="input-wrap">
+                        <input type="text" id="title" placeholder=" ">
+                        <span class="clear-btn" data-target="title">×</span>
+                    </div>
                 </div>
                 <div class="textarea-wrapper">
                     <label for="author">作者：</label>
-                    <input type="text" id="author">
+                    <div class="input-wrap">
+                        <input type="text" id="author" placeholder=" ">
+                        <span class="clear-btn" data-target="author">×</span>
+                    </div>
                 </div>
                 <div class="textarea-wrapper">
                     <label for="website">发布网站：</label>
@@ -175,30 +207,45 @@
                 </div>
             </div>
 
-            <!-- 起始章节、终止章节和每行字符数在同一行 -->
+            <!-- 卷号、章节 -->
             <div class="input-row">
                 <div class="textarea-wrapper">
                     <label for="volume">卷号：</label>
-                    <input type="text" id="volume">
+                    <div class="input-wrap">
+                        <input type="text" id="volume" placeholder=" ">
+                        <span class="clear-btn" data-target="volume">×</span>
+                    </div>
                 </div>
                 <div class="textarea-wrapper">
                     <label for="startChapter">起始章节号：</label>
-                    <input type="text" id="startChapter" placeholder="建议使用阿拉伯数字" oninput="updateEndChapter()">
+                    <div class="input-wrap">
+                        <input type="text" id="startChapter" oninput="updateEndChapter()">
+                        <span class="clear-btn" data-target="startChapter">×</span>
+                    </div>
                 </div>
                 <div class="textarea-wrapper">
                     <label for="chapterCount">章节数：</label>
-                    <input type="text" id="chapterCount" placeholder="可自动计算终止章节号" oninput="updateEndChapter()">
+                    <div class="input-wrap">
+                        <input type="text" id="chapterCount" oninput="updateEndChapter()">
+                        <span class="clear-btn" data-target="chapterCount">×</span>
+                    </div>
                 </div>
                 <div class="textarea-wrapper">
                     <label for="endChapter">终止章节号：</label>
-                    <input type="text" id="endChapter" placeholder="单章时可为空">
+                    <div class="input-wrap">
+                        <input type="text" id="endChapter" placeholder="单章时可为空">
+                        <span class="clear-btn" data-target="endChapter">×</span>
+                    </div>
                 </div>
             </div>
 
             <div class="input-row">
                 <div class="textarea-wrapper">
                     <label for="charLimit">每行字符数：</label>
-                    <input type="number" id="charLimit" value="0" min="0" placeholder="为0时不做限制">
+                    <div class="input-wrap">
+                        <input type="number" id="charLimit" value="0" min="0" placeholder=" ">
+                        <span class="clear-btn" data-target="charLimit">×</span>
+                    </div>
                 </div>
 
                 <!-- 繁简转换选择 -->
@@ -259,7 +306,10 @@
 
             <div class="textarea-wrapper">
                 <label for="publishPage">发布页面：</label>
-                <textarea id="publishPage" rows="1"></textarea>
+                <div class="input-wrap">
+                    <input type="text" id="publishPage">
+                    <span class="clear-btn" data-target="publishPage">×</span>
+                </div>
             </div>
 
             <div class="button-container">
@@ -276,6 +326,17 @@
     <script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.min.js"></script>
 
     <script>
+        // 清除按钮逻辑
+        document.querySelectorAll('.clear-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const input = document.getElementById(btn.dataset.target);
+                if (input) {
+                    input.value = '';
+                    input.focus();
+                }
+            });
+        });
+
         // 初始化 OpenCC
         let converter;
 
@@ -338,9 +399,9 @@
             } else {
                 formattedChapter = `${startChapter}-${endChapter}`;
             }
-            if (!volume){
+            if (!volume) {
                 formattedChapter = `（${formattedChapter}）`;
-            } else{
+            } else {
                 formattedChapter = `（${volume} ${formattedChapter}）`;
             }
 
