@@ -333,6 +333,11 @@
                 if (input) {
                     input.value = '';
                     input.focus();
+
+                    // 当清除的是“起始章节号”或“章节数”时，同步清空终止章节号
+                    if (input.id === 'startChapter' || input.id === 'chapterCount') {
+                        updateEndChapter();  
+                    }
                 }
             });
         });
