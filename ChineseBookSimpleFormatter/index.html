@@ -85,6 +85,47 @@
             transition: border 0.3s;
         }
 
+        
+        input[type="date"] {
+            width: 100%;
+            padding: 10px 52px 10px 10px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: border 0.3s;
+            cursor: pointer;
+        }
+
+        .date-button-group {
+            position: absolute;
+            top: 50%;
+            right: 6px;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .date-adjust-btn {
+            width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            background-color: #ecf0f1;
+            border: 1px solid #ccc;
+            color: #333;
+            font-size: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .date-adjust-btn:hover {
+            background-color: #dfe6e9;
+        }
+
         input:focus,
         select:focus,
         textarea:focus {
@@ -204,6 +245,16 @@
                 <div class="textarea-wrapper">
                     <label for="website">发布网站：</label>
                     <input type="text" id="website" placeholder="同时生成时间信息">
+                </div>
+                <div class="textarea-wrapper">
+                    <label for="publishDate">日期：</label>
+                    <div class="input-wrap">
+                        <input id="publishDate" type="date">
+                        <div class="date-button-group">
+                            <span class="date-adjust-btn" data-target="publishDate" data-step="-1">−</span>
+                            <span class="date-adjust-btn" data-target="publishDate" data-step="1">+</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -342,6 +393,27 @@
             });
         });
 
+            document.querySelectorAll('.date-adjust-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.dataset.target;
+                const step = parseInt(btn.dataset.step, 10);
+                adjustDateInput(targetId, step);
+            });
+        });
+
+        function adjustDateInput(id, dayStep) {
+            const input = document.getElementById(id);
+            if (!input) return;
+
+            let dateValue = input.value ? new Date(input.value) : new Date();
+            dateValue.setDate(dateValue.getDate() + dayStep);
+            const year = dateValue.getFullYear();
+            const month = String(dateValue.getMonth() + 1).padStart(2, '0');
+            const day = String(dateValue.getDate()).padStart(2, '0');
+            input.value = `${year}-${month}-${day}`;
+            input.focus();
+        }
+
         // 初始化 OpenCC
         let converter;
 
@@ -395,6 +467,7 @@
             var startChapter = document.getElementById('startChapter').value;
             var endChapter = document.getElementById('endChapter').value;
             var website = document.getElementById('website').value.trim();
+            var publishDateValue = document.getElementById('publishDate').value;
             var charLimit = parseInt(document.getElementById('charLimit').value);
 
             // 章节号格式化
@@ -426,11 +499,18 @@
             var meta = `${formattedTitle}\n\n\n${formattedAuthor}\n`;
 
             if (website.length > 0) {
-                // 获取当前日期
-                var currentDate = new Date();
-                var formattedDate = currentDate.getFullYear() + '/' +
-                    (currentDate.getMonth() + 1).toString().padStart(2, '0') + '/' +
-                    currentDate.getDate().toString().padStart(2, '0');
+                var formattedDate = '';
+                if (publishDateValue) {
+                    var selectedDate = new Date(publishDateValue);
+                    formattedDate = selectedDate.getFullYear() + '/' +
+                        (selectedDate.getMonth() + 1).toString().padStart(2, '0') + '/' +
+                        selectedDate.getDate().toString().padStart(2, '0');
+                } else {
+                    var currentDate = new Date();
+                    formattedDate = currentDate.getFullYear() + '/' +
+                        (currentDate.getMonth() + 1).toString().padStart(2, '0') + '/' +
+                        currentDate.getDate().toString().padStart(2, '0');
+                }
 
                 var postInfo = `${formattedDate} 发布于 ${website}\n`;
                 meta += postInfo;
