@@ -472,10 +472,24 @@
 
             // 章节号格式化
             var formattedChapter;
-            if (!endChapter) {
-                formattedChapter = `${startChapter}`;
+            // 检查起始章节号是否以 e 结尾（完结标记）
+            var isCompleted = startChapter.endsWith('e') || startChapter.endsWith('E');
+            // 检查起始章节号是否以 s 结尾（单章标记）
+            var isSingleChapter = isCompleted || startChapter.endsWith('s') || startChapter.endsWith('S');
+            // 检查终止章节号是否以 e 结尾（完结标记）
+            isCompleted ||=  endChapter.endsWith('e') || endChapter.endsWith('E');
+            
+            // 移除末尾的 s 和 e
+            var startChapterDisplay = isSingleChapter ? startChapter.slice(0, -1) : startChapter;
+            
+            if (isSingleChapter || !endChapter) {
+                formattedChapter = `${startChapterDisplay}`;
             } else {
-                formattedChapter = `${startChapter}-${endChapter}`;
+                var endChapterDisplay = isCompleted ? endChapter.slice(0, -1) : endChapter;
+                formattedChapter = `${startChapterDisplay}-${endChapterDisplay}`;
+            }
+            if (isCompleted) {
+                formattedChapter += '完';
             }
             if (!volume) {
                 formattedChapter = `（${formattedChapter}）`;
